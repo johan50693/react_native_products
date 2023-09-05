@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, {useContext} from 'react';
 import { Background } from '../components/Background';
 import { WhiteLogo } from '../components/WhiteLogo';
 import { Platform, Text, TextInput, View, KeyboardAvoidingView, Keyboard } from 'react-native';
@@ -7,10 +7,13 @@ import { loginStyles } from '../theme/loginTheme';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useForm } from '../hook/useForm';
 import { StackScreenProps } from '@react-navigation/stack';
+import { Authcontext } from '../context/AuthContext';
 
 interface Props extends StackScreenProps<any,any> {}
 
 export const LoginScreen = ({navigation}:Props) => {
+
+  const {signIn} = useContext(Authcontext);
 
   const {email, password, onChange} = useForm({
     email: '',
@@ -18,7 +21,8 @@ export const LoginScreen = ({navigation}:Props) => {
   });
 
   const onLogin = () => {
-    console.log({email,password});
+
+    signIn({correo: email, password});
     Keyboard.dismiss();
   };
 
