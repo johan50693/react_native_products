@@ -44,11 +44,15 @@ export const AuthProvider = ({children}:any) => {
 
     } catch (error) {
       console.log(error.response.data.msg);
+      dispatch({
+        type: 'addError',
+        payload: error.response.data.msg || 'Informnación incorrecta',
+      });
     }
   };
 
   const removeError = () => {
-
+    dispatch({type: 'removeError'});
   };
 
   return (

@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import { Background } from '../components/Background';
 import { WhiteLogo } from '../components/WhiteLogo';
-import { Platform, Text, TextInput, View, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { Platform, Text, TextInput, View, KeyboardAvoidingView, Keyboard, Alert } from 'react-native';
 import { loginStyles } from '../theme/loginTheme';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useForm } from '../hook/useForm';
@@ -13,12 +13,23 @@ interface Props extends StackScreenProps<any,any> {}
 
 export const LoginScreen = ({navigation}:Props) => {
 
-  const {signIn} = useContext(Authcontext);
+  const {signIn, errorMessage, removeError} = useContext(Authcontext);
 
   const {email, password, onChange} = useForm({
     email: '',
     password: '',
   });
+
+  useEffect(() => {
+
+    if (errorMessage.length === 0) {return;}
+
+    Alert.alert('Login incorrecto', errorMessage, [{
+      text: 'OK',
+      onPress: removeError,
+    }]);
+
+  }, [errorMessage]);
 
   const onLogin = () => {
 
