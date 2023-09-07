@@ -1,15 +1,18 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
-import { View, Text, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import React, { useContext, useEffect } from 'react';
+import { View, Text, KeyboardAvoidingView, Platform, TextInput, TouchableOpacity, Keyboard, Alert } from 'react-native';
 import { loginStyles } from '../theme/loginTheme';
 import { WhiteLogo } from '../components/WhiteLogo';
 import { useForm } from '../hook/useForm';
 import { StackScreenProps } from '@react-navigation/stack';
+import { Authcontext } from '../context/AuthContext';
 
 interface Props extends StackScreenProps<any,any> {}
 
 
 export const RegisterScreen = ({navigation}:Props) => {
+
+  const {errorMessage,removeError,signUp} = useContext(Authcontext);
 
   const {email, password, name, onChange} = useForm({
     name: '',
@@ -18,9 +21,20 @@ export const RegisterScreen = ({navigation}:Props) => {
   });
 
   const onRegister = () => {
-    console.log({email,name,password});
+    signUp({correo: email, nombre: name,password});
     Keyboard.dismiss();
   };
+
+  useEffect(() => {
+
+    if (errorMessage.length === 0) {return;}
+
+    Alert.alert('Registro incorrecto', errorMessage, [{
+      text: 'OK',
+      onPress: removeError,
+    }]);
+
+  }, [errorMessage]);
 
   return (
     <>
@@ -46,7 +60,7 @@ export const RegisterScreen = ({navigation}:Props) => {
                   (Platform.OS === 'ios') && loginStyles.inputFieldIOS,
                 ]}
                 selectionColor="white"
-                onChangeText={ (value) => onChange(value, 'email')}
+                onChangeText={ (value) => onChange(value, 'name')}
                 value={name}
                 onSubmitEditing={onRegister}
                 autoCapitalize="words"

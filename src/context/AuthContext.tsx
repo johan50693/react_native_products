@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, {createContext, useEffect, useReducer} from 'react';
-import { LoginData, LoginResponse, Usuario } from '../interface/appInterfaces';
+import { LoginData, LoginResponse, RegisterData, Usuario } from '../interface/appInterfaces';
 import { AuthState, authReducer } from './authReducer';
 import cafeApi from '../api/cafeApi';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +10,7 @@ type AuthcontextProps = {
   token: string | null;
   user: Usuario | null;
   status: 'checking' | 'authenticated' | 'not-authenticated';
-  signUp: (LoginData:LoginData) => void;
+  signUp: (RegisterData:RegisterData) => void;
   logOut: () => void;
   signIn: (LoginData:LoginData) => void;
   removeError: () => void;
@@ -56,8 +56,28 @@ export const AuthProvider = ({children}:any) => {
 
   };
 
-  const signUp = () => {
+  const signUp = async ({correo,nombre,password}: RegisterData) => {
 
+    try {
+
+      const {data} = await cafeApi.post<LoginResponse>('/usuarios',{nombre,correo,password});
+
+      dispatch({
+        type: 'signIUp',
+        payload: {
+          token: data.token,
+          user: data.usuario},
+      });
+
+      await AsyncStorage.setItem('token', data.token);
+
+    } catch (error:any) {
+
+      dispatch({
+        type: 'addError',
+        payload: error.response.data.errors[0].msg || 'Informnación incorrecta',
+      });
+    }
   };
 
   const logOut = async () => {
@@ -78,7 +98,7 @@ export const AuthProvider = ({children}:any) => {
 
       await AsyncStorage.setItem('token', token);
 
-    } catch (error) {
+    } catch (error: any) {
       console.log(error.response.data.msg);
       dispatch({
         type: 'addError',
