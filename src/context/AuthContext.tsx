@@ -44,7 +44,9 @@ export const AuthProvider = ({children}:any) => {
       return dispatch({type: 'notAuthenticated'});
     }
 
-     dispatch({
+    await AsyncStorage.setItem('token', resp.data.token);
+
+    dispatch({
       type: 'signIUp',
       payload: {
         token: resp.data.token,
