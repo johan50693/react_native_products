@@ -11,6 +11,7 @@ type AuthcontextProps = {
   user: Usuario | null;
   status: 'checking' | 'authenticated' | 'not-authenticated';
   signUp: (LoginData:LoginData) => void;
+  logOut: () => void;
   signIn: (LoginData:LoginData) => void;
   removeError: () => void;
 }
@@ -59,6 +60,11 @@ export const AuthProvider = ({children}:any) => {
 
   };
 
+  const logOut = async () => {
+    await AsyncStorage.removeItem('token');
+    dispatch({type: 'logout'});
+  };
+
   const signIn = async ({correo, password}:LoginData) => {
 
     try {
@@ -89,6 +95,7 @@ export const AuthProvider = ({children}:any) => {
     <Authcontext.Provider value={{
       ...state,
       signUp,
+      logOut,
       signIn,
       removeError,
     }}>
