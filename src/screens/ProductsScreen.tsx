@@ -1,12 +1,32 @@
 /* eslint-disable prettier/prettier */
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import { View, FlatList, Text, StyleSheet } from 'react-native';
 import { ProductsContext } from '../context/ProductsContext';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { StackScreenProps } from '@react-navigation/stack';
+import { ProductsStackParams } from '../navigator/ProductsNavigator';
 
-export const ProductsScreen = () => {
+interface Props extends StackScreenProps<ProductsStackParams, 'ProductScreen'>{}
+
+export const ProductsScreen = ({navigation}:Props) => {
 
   const {products, loadProducts} = useContext(ProductsContext);
+
+  useEffect(() => {
+
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={{marginRight: 10}}
+          onPress={ () => navigation.navigate('ProductScreen',{})}
+        >
+          <Text>Agregar</Text>
+        </TouchableOpacity>
+      ),
+    });
+
+  }, []);
 
   return (
       <View style={{
@@ -19,6 +39,12 @@ export const ProductsScreen = () => {
           renderItem={ ({item}) => (
             <TouchableOpacity
               activeOpacity={0.8}
+              onPress={
+                () => navigation.navigate('ProductScreen',{
+                  id: item._id,
+                  name: item.nombre,
+                })
+              }
             >
               <Text style={styles.productName}>{item.nombre}</Text>
             </TouchableOpacity>
