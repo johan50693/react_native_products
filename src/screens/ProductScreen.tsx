@@ -47,12 +47,13 @@ export const ProductScreen = ({route,navigation}: Props) => {
     });
   };
 
-  const saveOrUpdate = () => {
+  const saveOrUpdate = async () => {
     if (id.length > 0){
       updateProduct(categoriaId,nombre,_id);
     } else {
       const tempCategoriaId = categoriaId || categories[0]._id;
-      addProduct(tempCategoriaId,nombre);
+      const newProduct = await addProduct(tempCategoriaId,nombre);
+      onChange(newProduct._id, '_id');
     }
   };
 
@@ -93,7 +94,7 @@ export const ProductScreen = ({route,navigation}: Props) => {
           />
 
           {
-            (id.length > 0) && (
+            (_id.length > 0) && (
               <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 10}} >
                 <Button
                   title="Cámara"
