@@ -13,8 +13,8 @@ interface Props extends StackScreenProps<ProductsStackParams, 'ProductScreen'>{}
 export const ProductScreen = ({route,navigation}: Props) => {
 
   const {id = '', name = ''} = route.params;
-  const {categories,isLoading} = useCategories();
-  const {loadProductById} = useContext(ProductsContext);
+  const {categories} = useCategories();
+  const {loadProductById,addProduct,updateProduct} = useContext(ProductsContext);
 
   const {_id,categoriaId,nombre,img,form, onChange, setFormValue} = useForm({
     _id: id,
@@ -26,9 +26,9 @@ export const ProductScreen = ({route,navigation}: Props) => {
   useEffect(() => {
 
     navigation.setOptions({
-      title: (name) ? name : 'Nuevo Producto',
+      title: (nombre) ? nombre : 'Sin nombre de Producto',
     });
-  }, []);
+  }, [nombre]);
 
   useEffect(() => {
     loadProduct();
@@ -47,6 +47,15 @@ export const ProductScreen = ({route,navigation}: Props) => {
     });
   };
 
+  const saveOrUpdate = () => {
+    if (id.length > 0){
+      updateProduct(categoriaId,nombre,_id);
+    } else {
+      const tempCategoriaId = categoriaId || categories[0]._id;
+      addProduct(tempCategoriaId,nombre);
+    }
+  };
+
   return (
       <View style={styles.container}>
         <ScrollView>
@@ -54,7 +63,7 @@ export const ProductScreen = ({route,navigation}: Props) => {
           <TextInput
             placeholder="Producto"
             style= {styles.textInput}
-            value={name}
+            value={nombre}
             onChangeText={ (value) => onChange(value,'nombre')}
           />
 
@@ -69,7 +78,7 @@ export const ProductScreen = ({route,navigation}: Props) => {
                 categories.map( (c) => (
                   <Picker.Item
                     label={c.nombre}
-                    value={c.nombre}
+                    value={c._id}
                     key={c._id}
                   />
                 ))
@@ -79,25 +88,29 @@ export const ProductScreen = ({route,navigation}: Props) => {
 
           <Button
             title="Guardar"
-            onPress={ () => {}}
+            onPress={saveOrUpdate}
             color="#5856d6"
           />
 
-          <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 10}} >
-            <Button
-              title="Cámara"
-              onPress={ () => {}}
-              color="#5856d6"
-            />
+          {
+            (id.length > 0) && (
+              <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 10}} >
+                <Button
+                  title="Cámara"
+                  onPress={ () => {}}
+                  color="#5856d6"
+                />
 
-            <View style={{width: 10}} />
+                <View style={{width: 10}} />
 
-            <Button
-              title="Galeria"
-              onPress={ () => {}}
-              color="#5856d6"
-            />
-          </View>
+                <Button
+                  title="Galeria"
+                  onPress={ () => {}}
+                  color="#5856d6"
+                />
+              </View>
+            )
+          }
 
           {
             (img.length > 0) && (
