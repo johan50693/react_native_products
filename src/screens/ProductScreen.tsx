@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useState, useContext} from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Button } from 'react-native';
+import React, {useEffect, useContext} from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, Button, Image } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { ProductsStackParams } from '../navigator/ProductsNavigator';
 import {Picker} from '@react-native-picker/picker';
@@ -14,7 +14,6 @@ export const ProductScreen = ({route,navigation}: Props) => {
 
   const {id = '', name = ''} = route.params;
   const {categories,isLoading} = useCategories();
-  const [selectedLanguage, setSelectedLanguage] = useState();
   const {loadProductById} = useContext(ProductsContext);
 
   const {_id,categoriaId,nombre,img,form, onChange, setFormValue} = useForm({
@@ -63,10 +62,8 @@ export const ProductScreen = ({route,navigation}: Props) => {
           <Text style={styles.label}>Categoria:</Text>
 
           <Picker
-            selectedValue={selectedLanguage}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedLanguage(itemValue)
-            }>
+            selectedValue={categoriaId}
+            onValueChange={(itemValue) => onChange(itemValue,'categoriaId') }>
 
               {
                 categories.map( (c) => (
@@ -102,9 +99,19 @@ export const ProductScreen = ({route,navigation}: Props) => {
             />
           </View>
 
-          <Text>
-              {JSON.stringify(form,null,2)}
-          </Text>
+          {
+            (img.length > 0) && (
+
+              <Image
+                source={{uri: img}}
+                style={{
+                  width: '100%',
+                  height: 300,
+                  marginTop: 20,
+                }}
+              />
+            )
+          }
 
         </ScrollView>
       </View>
