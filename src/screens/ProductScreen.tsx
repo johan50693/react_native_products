@@ -1,18 +1,28 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Button } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { ProductsStackParams } from '../navigator/ProductsNavigator';
 import {Picker} from '@react-native-picker/picker';
 import { useCategories } from '../hook/useCategories';
+import { useForm } from '../hook/useForm';
+import { ProductsContext } from '../context/ProductsContext';
 
 interface Props extends StackScreenProps<ProductsStackParams, 'ProductScreen'>{}
 
 export const ProductScreen = ({route,navigation}: Props) => {
 
-  const {id,name} = route.params;
+  const {id = '', name = ''} = route.params;
   const {categories,isLoading} = useCategories();
   const [selectedLanguage, setSelectedLanguage] = useState();
+  const {loadProductById} = useContext(ProductsContext);
+
+  const {_id,categoriaId,nombre,img,form, onChange, setFormValue} = useForm({
+    _id: id,
+    categoriaId: '',
+    nombre: name,
+    img: '',
+  });
 
   useEffect(() => {
 
@@ -21,6 +31,22 @@ export const ProductScreen = ({route,navigation}: Props) => {
     });
   }, []);
 
+  useEffect(() => {
+    loadProduct();
+  }, []);
+
+
+  const loadProduct = async () => {
+
+    if (id.length === 0) {return;}
+    const product = await loadProductById(id);
+    setFormValue({
+      _id: id,
+      categoriaId: product.categoria._id,
+      nombre: name,
+      img: product.img || '',
+    });
+  };
 
   return (
       <View style={styles.container}>
@@ -29,7 +55,8 @@ export const ProductScreen = ({route,navigation}: Props) => {
           <TextInput
             placeholder="Producto"
             style= {styles.textInput}
-
+            value={name}
+            onChangeText={ (value) => onChange(value,'nombre')}
           />
 
           {/* Selector / Pcker */}
@@ -74,6 +101,10 @@ export const ProductScreen = ({route,navigation}: Props) => {
               color="#5856d6"
             />
           </View>
+
+          <Text>
+              {JSON.stringify(form,null,2)}
+          </Text>
 
         </ScrollView>
       </View>
