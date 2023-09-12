@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import React, {useEffect, useContext} from 'react';
+import React, {useEffect, useContext, useState} from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, Button, Image } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { ProductsStackParams } from '../navigator/ProductsNavigator';
@@ -7,12 +7,14 @@ import {Picker} from '@react-native-picker/picker';
 import { useCategories } from '../hook/useCategories';
 import { useForm } from '../hook/useForm';
 import { ProductsContext } from '../context/ProductsContext';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 interface Props extends StackScreenProps<ProductsStackParams, 'ProductScreen'>{}
 
 export const ProductScreen = ({route,navigation}: Props) => {
 
   const {id = '', name = ''} = route.params;
+  const [tempUri, setTempUri] = useState<string>('');
   const {categories} = useCategories();
   const {loadProductById,addProduct,updateProduct} = useContext(ProductsContext);
 
@@ -57,6 +59,19 @@ export const ProductScreen = ({route,navigation}: Props) => {
     }
   };
 
+  const takePhoto = () => {
+    launchCamera({
+      mediaType: 'photo',
+      quality: 0.5,
+    }, (resp) => {
+      if (resp.didCancel) {return;}
+      if (!resp.assets[0].uri) {return;}
+
+      setTempUri(resp.assets[0].uri);
+
+    });
+  };
+
   return (
       <View style={styles.container}>
         <ScrollView>
@@ -98,7 +113,7 @@ export const ProductScreen = ({route,navigation}: Props) => {
               <View style={{flexDirection: 'row', justifyContent: 'center', marginTop: 10}} >
                 <Button
                   title="Cámara"
-                  onPress={ () => {}}
+                  onPress={takePhoto}
                   color="#5856d6"
                 />
 
@@ -114,10 +129,24 @@ export const ProductScreen = ({route,navigation}: Props) => {
           }
 
           {
-            (img.length > 0) && (
+            (img.length > 0 && !tempUri) && (
 
               <Image
                 source={{uri: img}}
+                style={{
+                  width: '100%',
+                  height: 300,
+                  marginTop: 20,
+                }}
+              />
+            )
+          }
+
+          {
+            (tempUri.length > 0 ) && (
+
+              <Image
+                source={{uri: tempUri}}
                 style={{
                   width: '100%',
                   height: 300,
